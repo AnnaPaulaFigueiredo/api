@@ -7,12 +7,12 @@ app = Flask(__name__)
 def homepage():
     return "A api está no ar."
 
-@app.route('/api-playstore-reviews')
+@app.route('/api-playstore-reviews', methods=['GET'])
 def get_data():
-
+    
     link = request.args.get('link')
     link = link.split("=")[-1]
-    
+   
     if not link:
         return jsonify({'error': 'Parâmetro "link" ausente na URL'}), 400
     
