@@ -27,7 +27,7 @@ def get_data():
     
     app_reviews = reviews_all(link, lang='pt', country='br', sort=Sort.NEWEST)
     app_reviews = filter_by_year(app_reviews, [2024, 2023] )
-    reviews_json = [{"content": item["content"], "replyContent": item["replyContent"]} for item in app_reviews]
+    reviews_json = [{"content": item["content"], "replyContent": item["replyContent"], "year":item["at"].year} for item in app_reviews]
  
     return jsonify(reviews_json)
 
