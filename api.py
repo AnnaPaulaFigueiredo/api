@@ -26,7 +26,7 @@ def get_data():
         return jsonify({'error': 'Parâmetro "link" ausente na URL'}), 400
     
     app_reviews = reviews_all(link, lang='pt', country='br', sort=Sort.NEWEST)
-    app_reviews = filter_by_year(app_reviews, [2024, 2023] )
+    #app_reviews = filter_by_year(app_reviews, [2024, 2023] )
     reviews_json = [{"userName":item["userName"], "userImage":item["userImage"], "content": item["content"], 
                      "score":item["score"], "thumbsUpCount":item["thumbsUpCount"],
                      "replyContent": item["replyContent"], "appVersion":item["appVersion"],
