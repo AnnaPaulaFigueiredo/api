@@ -27,11 +27,11 @@ def get_data():
     
     app_reviews = reviews_all(link, lang='pt', country='br', sort=Sort.NEWEST)
     app_reviews = filter_by_year(app_reviews, [2024, 2023] )
-    reviews_json = [{"userName":item["userName"], "content": item["content"], 
-                    "replyContent": item["replyContent"], "score":item["score"], 
-                    "date":item["at"]       
+    reviews_json = [{"userName":item["userName"], "userImage":item["userImage"], "content": item["content"], 
+                     "score":item["score"], "thumbsUpCount":item["thumbsUpCount"],
+                     "replyContent": item["replyContent"], "appVersion":item["appVersion"],
+                     "date":item["at"]       
                     } for item in app_reviews]
- 
     return jsonify(reviews_json)
 
 if __name__ == '__main__':
