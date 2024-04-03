@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request
-from google_play_scraper import reviews_all, Sort
+from google_play_scraper import app, reviews_all, Sort
 from datetime import datetime
-N_REVIEWS = 20000
+N_REVIEWS = 50 #20000
 
 # FUNCITONS
 def get_reviews(app_id, lang, country, sort, n_reviews):
@@ -58,25 +58,25 @@ def homepage():
 # Avaliações sem os comentários
 @app.route('/api-playstore-score', methods=['GET'])
 def get_score():
-    
+
     link = request.args.get('link')
     link = link.split("=")[-1]
 
-    year = request.args.get('ano', None)
-   
     if not link:
         return jsonify({'error': 'Parâmetro "link" ausente na URL'}), 400
 
-    app_reviews = get_reviews(app_id=link, lang='', country='', sort=Sort.NEWEST , n_reviews=N_REVIEWS)
+    app_details = app( link, lang='pt', country='br' )
 
-    if year:
-        app_reviews = filter_by_year(app_reviews, int(year))
+    score_json = {"score":app_details["score"],
+                  "reviews":app_details["reviews"],
+                  "1":app_details["histogram"][0],
+                  "2":app_details["histogram"][1],
+                  "3":app_details["histogram"][2],
+                  "4":app_details["histogram"][3],
+                  "5":app_details["histogram"][4],     
+                    } 
     
-    scores_json = [{"userName":item["userName"], "userImage":item["userImage"],
-                    "score":item["score"], "at":item["at"]       
-                    } for item in app_reviews]
-    
-    return jsonify(scores_json)
+    return jsonify(score_json)
 
 # Score mensal de avaliacoes
 @app.route('/api-playstore-monthly-score', methods=['GET'])
@@ -90,7 +90,7 @@ def get_monthly_score():
     if not link:
         return jsonify({'error': 'Parâmetro "link" ausente na URL'}), 400
 
-    app_reviews = get_reviews(app_id=link, lang='', country='', sort=Sort.NEWEST , n_reviews=N_REVIEWS)
+    app_reviews = get_reviews(app_id=link, lang='pt', country='br', sort=Sort.NEWEST , n_reviews=N_REVIEWS)
 
     if year:
         app_reviews = filter_by_year(app_reviews, int(year))
@@ -112,14 +112,14 @@ def get_data():
     if not link:
         return jsonify({'error': 'Parâmetro "link" ausente na URL'}), 400
 
-    app_reviews = get_reviews(app_id=link, lang='', country='', sort=Sort.NEWEST , n_reviews=N_REVIEWS)
+    app_reviews = get_reviews(app_id=link, lang='pt', country='br', sort=Sort.NEWEST , n_reviews=N_REVIEWS)
 
     if year:
         app_reviews = filter_by_year(app_reviews, int(year))
    
     reviews_json = [{"userName":item["userName"], "userImage":item["userImage"], "content": item["content"], 
                      "score":item["score"], "thumbsUpCount":item["thumbsUpCount"],
-                     "replyContent": item["replyContent"], "repliedAt": item["repliedAt"],"appVersion":item["appVersion"],
+                     "replyContent": item["replyContent"], "repliedAt": item["repliedAt"],
                      "at":item["at"]       
                     } for item in app_reviews]
     
