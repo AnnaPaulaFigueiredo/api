@@ -1,9 +1,10 @@
 from flask import Flask, jsonify, request
-from google_play_scraper import app, reviews_all, Sort
+from google_play_scraper import reviews_all, Sort
+from google_play_scraper import app as app_scraper
 from datetime import datetime
 N_REVIEWS = 50 #20000
 
-# FUNCITONS
+# FUNCTIONS
 def get_reviews(app_id, lang, country, sort, n_reviews):
 
     all_reviews = []  
@@ -64,11 +65,11 @@ def get_score():
 
     if not link:
         return jsonify({'error': 'Parâmetro "link" ausente na URL'}), 400
-
-    app_details = app( link, lang='pt', country='br' )
+        
+    app_details = app_scraper( link, lang='pt', country='br' )
 
     score_json = {"score":app_details["score"],
-                  "reviews":app_details["reviews"],
+                  "n_reviews":app_details["reviews"],
                   "1":app_details["histogram"][0],
                   "2":app_details["histogram"][1],
                   "3":app_details["histogram"][2],
