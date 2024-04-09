@@ -94,7 +94,6 @@ def get_monthly_score():
         return jsonify({'error': 'Parâmetro "link" ausente na URL'}), 400
 
     app_reviews = get_reviews(app_id=link, lang='pt', country='br', sort=Sort.NEWEST, n_reviews=N_REVIEWS)
-
     if year:
         app_reviews = filter_by_year(app_reviews, int(year))
 
@@ -116,7 +115,7 @@ def get_data():
         return jsonify({'error': 'Parâmetro "link" ausente na URL'}), 400
 
     app_reviews = get_reviews(app_id=link, lang='pt', country='br', sort=Sort.NEWEST , n_reviews=N_REVIEWS)
-
+    
     if year:
         app_reviews = filter_by_year(app_reviews, int(year))
    
@@ -130,4 +129,3 @@ def get_data():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
-
