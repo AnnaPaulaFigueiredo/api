@@ -43,12 +43,14 @@ def calculate_mean_score_by_month(data):
         mean_score_by_year_month[year_month]['total'] += item['score']
         mean_score_by_year_month[year_month]['count'] += 1
 
-    sorted_result = {}
-    for year_month, info in sorted(mean_score_by_year_month.items(), key=lambda x: x[0], reverse=True):
+    dates = []
+    scores = []
+    for year_month, info in sorted(mean_score_by_year_month.items(), key=lambda x: x[0]):
         mean = round(info['total'] / info['count'], 2)
-        sorted_result[year_month] = mean
+        dates.append(year_month)
+        scores.append(mean)
 
-    return sorted_result
+    return {"date": dates, "scores": scores}
 
 # ROUTES
 app = Flask(__name__)
@@ -91,15 +93,15 @@ def get_monthly_score():
     if not link:
         return jsonify({'error': 'Parâmetro "link" ausente na URL'}), 400
 
-    app_reviews = get_reviews(app_id=link, lang='pt', country='br', sort=Sort.NEWEST , n_reviews=N_REVIEWS)
+    app_reviews = get_reviews(app_id=link, lang='pt', country='br', sort=Sort.NEWEST, n_reviews=N_REVIEWS)
 
     if year:
         app_reviews = filter_by_year(app_reviews, int(year))
 
-    scores_json = [{"score":item["score"], "at":item["at"]} for item in app_reviews]
+    scores_json = [{"score": item["score"], "at": item["at"]} for item in app_reviews]
     
     monthly_scores = calculate_mean_score_by_month(scores_json)
-
+    
     return jsonify(monthly_scores)
 
 # Reviews com o usuário e foto
