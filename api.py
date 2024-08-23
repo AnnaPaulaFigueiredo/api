@@ -1,22 +1,24 @@
 from flask import Flask, jsonify, request
-from google_play_scraper import reviews_all, Sort
+from google_play_scraper import reviews, reviews_all, Sort
 from google_play_scraper import app as app_scraper
 from datetime import datetime
-N_REVIEWS = 50 #20000
+N_REVIEWS = 100 #20000
 
 # FUNCTIONS
 def get_reviews(app_id, lang, country, sort, n_reviews):
 
     all_reviews = []  
     
-    while len(all_reviews) < n_reviews:
-        
-        result = reviews_all(
+    '''while len(all_reviews) < n_reviews:
+        # reviews_all, para vir todos, review máximo 100
+        result = reviews(
             app_id,
-            sleep_milliseconds=0,
+            #sleep_milliseconds=0,
             lang=lang,
             country=country,
             sort=sort,
+            count=n_reviews,
+            filter_score_with=None
         )
         
         if not result:
@@ -26,8 +28,17 @@ def get_reviews(app_id, lang, country, sort, n_reviews):
  
         if len(all_reviews) >= n_reviews:
             break
-
-    return all_reviews
+    '''
+    result, continuation_token = reviews(
+            app_id,
+            #sleep_milliseconds=0,
+            lang=lang,
+            country=country,
+            sort=sort,
+            count=n_reviews,
+            filter_score_with=None
+        )
+    return result 
 
 def filter_by_year(reviews, year):
     return [review for review in reviews if review['at'].year == year]
@@ -107,18 +118,20 @@ def get_monthly_score():
 @app.route('/api-playstore-reviews', methods=['GET'])
 def get_data():
     link = request.args.get('link')
-    link = link.split("=")[-1]
-
-    year = request.args.get('ano', None)
-   
+    
     if not link:
         return jsonify({'error': 'Parâmetro "link" ausente na URL'}), 400
 
+    link = link.split("=")[-1] if "=" in link else link
+    
+    year = request.args.get('ano', None)
+  
     app_reviews = get_reviews(app_id=link, lang='pt', country='br', sort=Sort.NEWEST , n_reviews=N_REVIEWS)
     
     if year:
         app_reviews = filter_by_year(app_reviews, int(year))
-   
+    
+    
     reviews_json = [{"userName":item["userName"], "userImage":item["userImage"], "content": item["content"], 
                      "score":item["score"], "thumbsUpCount":item["thumbsUpCount"],
                      "replyContent": item["replyContent"], "repliedAt": item["repliedAt"],
